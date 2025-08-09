@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Reverse a String</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f4f4;
+            padding: 20px;
+            text-align: center;
+        }
+        form {
+            background: #fff;
+            padding: 20px;
+            display: inline-block;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        input[type="text"] {
+            padding: 10px;
+            width: 250px;
+            font-size: 16px;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            background: #28a745;
+            border: none;
+            color: white;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        button:hover {
+            background: #218838;
+        }
+        .result {
+            margin-top: 20px;
+            font-weight: bold;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+	<form id="reverseForm">
+	    <input type="text" name="input" placeholder="Enter a string" required>
+	    <button type="submit">Reverse & Save</button>
+	</form>
+
+	<div class="result" id="result">
+		
+	</div>
+
+	<script>
+	document.getElementById("reverseForm").addEventListener("submit", function(e) {
+	    e.preventDefault();
+	    let formData = new FormData(this);
+
+	    fetch("/reverse", 
+		{
+	        method: "POST",
+	        body: formData
+	    })
+	    .then(res => res.text())
+	    .then(data => {
+	        document.getElementById("result").innerText = "Reversed: " + data;
+			//console.log(data);
+	    })
+	    .catch(err => console.error(err));
+	});
+	</script>
+
+</body>
+
+
+</html>
