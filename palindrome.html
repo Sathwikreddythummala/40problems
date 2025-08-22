@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Palindrome Manager · DoubtsApp</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --brand-1: #0694c6;   /* TSR blue */
+      --brand-2: #d2ffff;   /* light aqua */
+      --brand-3: #0b5f87;   /* deep blue */
+      --accent: #00e0ff;    /* neon accent */
+      --bg: #0b1220;        /* dark base */
+      --fg: #e8f5ff;
+      --muted: #9fb7c7;
+      --success: #25d366;
+      --danger: #ff4d4f;
+      --warning: #ffcc00;
+      --card: rgba(255,255,255,0.08);
+      --glass: rgba(255,255,255,0.06);
+      --border: rgba(255,255,255,0.12);
+      --shadow: 0 10px 30px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.04);
+      --radius-2xl: 22px;
+    }
+
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+    body {
+      margin: 0;
+      font-family: 'Inter', system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      color: var(--fg);
+      background:
+        radial-gradient(1200px 1200px at 10% 10%, rgba(0, 224, 255, .15), transparent 60%),
+        radial-gradient(900px 900px at 90% 20%, rgba(9, 148, 198, .18), transparent 55%),
+        radial-gradient(900px 900px at 50% 110%, rgba(210, 255, 255, .10), transparent 60%),
+        linear-gradient(135deg, #06121e 0%, #0b1c2b 60%, #05111d 100%);
+      overflow-x: hidden;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 360px 1fr;
+      gap: 24px;
+      padding: 32px clamp(16px, 3vw, 48px);
+    }
+
+    @media (max-width: 980px) {
+      .grid { grid-template-columns: 1fr; }
+    }
+
+    .card {
+      background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
+      border: 1px solid var(--border);
+      border-radius: var(--radius-2xl);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+
+    .panel {
+      padding: 22px;
+    }
+
+    header.hero {
+      position: relative;
+      padding: 24px clamp(16px, 3vw, 48px) 0;
+    }
+
+    .brand {
+      display: flex; align-items: center; gap: 12px;
+    }
+    .brand .logo {
+      width: 44px; height: 44px; border-radius: 12px;
+      background:
+        radial-gradient(90px 50px at 70% 20%, rgba(255,255,255,.4), rgba(255,255,255,0) 60%),
+        linear-gradient(135deg, var(--brand-1), var(--brand-2));
+      box-shadow: 0 10px 25px rgba(6,148,198,.45), inset 0 1px 0 rgba(255,255,255,.35);
+      position: relative;
+    }
+    .brand h1 { font-size: clamp(20px, 3.2vw, 28px); margin: 0; letter-spacing: .4px; }
+    .brand small { color: var(--muted); }
+
+    .hero-sub {
+      margin-top: 8px; color: var(--muted);
+    }
+
+    .pill {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 8px 12px; border-radius: 999px; font-size: 12px; font-weight: 600;
+      background: linear-gradient(180deg, rgba(0,224,255,.18), rgba(0,224,255,.06));
+      border: 1px solid rgba(0,224,255,.35);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.25);
+    }
+
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center;
+      gap: 10px; padding: 12px 16px; border-radius: 14px; border: 1px solid var(--border);
+      background: linear-gradient(180deg, rgba(255,255,255,.09), rgba(255,255,255,.05));
+      color: var(--fg); font-weight: 600; cursor: pointer; transition: .2s ease transform, .2s ease opacity, .2s ease box-shadow;
+    }
+    .btn:hover { transform: translateY(-1px); box-shadow: 0 12px 24px rgba(0,0,0,.25); }
+    .btn.primary { background: linear-gradient(180deg, var(--brand-1), var(--brand-3)); border-color: rgba(255,255,255,.18); }
+    .btn.success { background: linear-gradient(180deg, #31d17b, #17a463); }
+    .btn.danger { background: linear-gradient(180deg, #ff6164, #c81d25); }
+    .btn.ghost { background: transparent; border-color: var(--border); }
+
+    .input, select {
+      width: 100%; padding: 12px 14px; border-radius: 14px; outline: none;
+      color: var(--fg); background: var(--glass); border: 1px solid var(--border);
+      transition: box-shadow .2s ease, border-color .2s ease;
+    }
+    .input:focus { border-color: var(--accent); box-shadow: 0 0 0 4px rgba(0,224,255,.15); }
+
+    .label { font-size: 12px; color: var(--muted); margin-bottom: 8px; display: inline-block; }
+
+    .form-group { display: grid; gap: 10px; }
+
+    .grid-2 { display: grid; gap: 12px; grid-template-columns: 1fr auto; }
+
+    .badge { padding: 6px 10px; border-radius: 999px; font-size: 12px; border: 1px solid var(--border); background: rgba(255,255,255,.05); }
+
+    .table {
+      width: 100%; border-collapse: collapse; font-size: 14px; overflow: hidden; border-radius: 16px;
+      border: 1px solid var(--border);
+    }
+    .table thead { background: linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.06)); }
+    .table th, .table td { padding: 14px 16px; text-align: left; border-bottom: 1px solid var(--border); }
+    .table tbody tr:hover { background: rgba(255,255,255,.04); }
+
+    .toolbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 12px; }
+
+    .status {
+      display: inline-flex; align-items: center; gap: 8px; padding: 10px 12px; border-radius: 12px;
+      background: rgba(0,224,255,.08); border: 1px solid rgba(0,224,255,.25);
+    }
+
+    .glow {
+      position: absolute; inset: -2px; border-radius: var(--radius-2xl);
+      background: radial-gradient(160px 60px at 10% 0%, rgba(210,255,255,.35), transparent 50%),
+                  radial-gradient(250px 120px at 90% 0%, rgba(6,148,198,.35), transparent 60%);
+      filter: blur(24px); opacity: .35; pointer-events: none;
+    }
+
+    /* Toasts */
+    .toasts { position: fixed; right: 20px; bottom: 20px; display: grid; gap: 10px; z-index: 1000; }
+    .toast { padding: 12px 14px; border-radius: 14px; border: 1px solid var(--border); background: var(--card); box-shadow: var(--shadow); display: flex; align-items: center; gap: 10px; }
+
+    /* Modal */
+    dialog { border: none; border-radius: 16px; background: var(--card); color: var(--fg); box-shadow: var(--shadow); width: min(560px, 94vw); }
+    dialog::backdrop { background: rgba(0,0,0,.55); }
+
+    .chip { font-weight: 700; letter-spacing: .3px; background: linear-gradient(180deg, var(--brand-2), var(--brand-1)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  </style>
+</head>
+<body>
+  <header class="hero">
+    <div class="brand">
+      <div class="logo"></div>
+      <div>
+        <h1>Palindrome Manager <span class="chip">/ DoubtsApp</span></h1>
+        <div class="hero-sub">Beautiful, fast UI to <strong>check</strong>, <strong>save</strong>, <strong>edit</strong>, and <strong>delete</strong> palindrome records.</div>
+      </div>
+    </div>
+  </header>
+
+  <main class="grid">
+    <!-- Left: Input / Actions -->
+    <section class="card panel" style="position: relative; overflow: hidden;">
+      <div class="glow"></div>
+      <div class="pill" style="margin-bottom: 14px;">💎 Glass UI · Metallic Blue</div>
+
+      <form id="create-form" class="form-group" onsubmit="event.preventDefault(); submitPalindrome();">
+        <label class="label" for="inputText">Your text</label>
+        <div class="grid-2">
+          <input id="inputText" class="input" type="text" placeholder="Type something to check…" required minlength="1" />
+          <button class="btn primary" type="submit">Check & Save</button>
+        </div>
+      </form>
+
+      <div id="check-status" class="status" style="margin-top: 14px; display:none;"></div>
+
+      <div style="height: 16px"></div>
+
+      <div class="toolbar">
+        
+        <div style="display:flex; gap:8px; align-items:center;">
+          <input id="search" class="input" placeholder="Search records…" oninput="filterTable()" style="width: 240px;"/>
+        </div>
+      </div>
+
+      <div style="font-size:12px; color:var(--muted);">Endpoints used: <code>GET /palindrome</code>, <code>POST /palindrome</code>, <code>PUT /palindrome</code>, <code>DELETE /palindrome</code></div>
+    </section>
+
+    <!-- Right: Table -->
+    <section class="card panel">
+      <div class="toolbar">
+        <h2 style="margin:0;">Saved Records</h2>
+        <div class="badge" id="count-badge">0 records</div>
+      </div>
+
+      <div style="overflow:auto;">
+        <table class="table" id="records-table">
+          <thead>
+            <tr>
+              <th style="width: 96px;">ID</th>
+              <th>Input</th>
+              <th>Output</th>
+              <th style="width: 220px;">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="tbody">
+          </tbody>
+        </table>
+      </div>
+
+      <div style="padding-top: 10px; color: var(--muted); font-size: 12px;">Tip: Click ✏ Edit to update input (backend will recompute output). Click 🗑 Delete to remove.</div>
+    </section>
+  </main>
+
+  <!-- Edit Modal -->
+  <dialog id="editModal">
+    <form id="edit-form" class="panel form-group" method="dialog" onsubmit="event.preventDefault(); saveEdit();">
+      <h3 style="margin: 0 0 10px 0;">Edit Record</h3>
+      <input type="hidden" id="edit-id" />
+      <label class="label" for="edit-input">Input</label>
+      <input class="input" id="edit-input" placeholder="Update input" required />
+      <div style="display:flex; justify-content:flex-end; gap: 10px; margin-top: 12px;">
+        <button class="btn ghost" onclick="closeModal()" type="button">Cancel</button>
+        <button class="btn success" type="submit">Save</button>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- Toasts -->
+  <div class="toasts" id="toasts"></div>
+
+  <script>
+    const API = {
+      GET: '/palindrome',
+      POST: '/palindrome',
+      PUT: '/palindrome',
+      DELETE: '/palindrome'
+    };
+
+    const tbody = document.getElementById('tbody');
+    const countBadge = document.getElementById('count-badge');
+
+    function toast(msg, type = 'info') {
+      const t = document.createElement('div');
+      t.className = 'toast';
+      t.textContent = msg;
+      if (type === 'success') t.style.borderColor = 'rgba(37,211,102,.6)';
+      if (type === 'error') t.style.borderColor = 'rgba(255,77,79,.6)';
+      if (type === 'warn') t.style.borderColor = 'rgba(255,204,0,.6)';
+      document.getElementById('toasts').appendChild(t);
+      setTimeout(() => t.remove(), 3000);
+    }
+
+    function setStatus(message, isPal = null) {
+      const el = document.getElementById('check-status');
+      el.style.display = 'inline-flex';
+      el.textContent = message;
+      if (isPal === true) {
+        el.style.borderColor = 'rgba(37,211,102,.5)';
+        el.style.background = 'rgba(37,211,102,.10)';
+      } else if (isPal === false) {
+        el.style.borderColor = 'rgba(255,77,79,.5)';
+        el.style.background = 'rgba(255,77,79,.10)';
+      } else {
+        el.style.borderColor = 'rgba(0,224,255,.25)';
+        el.style.background = 'rgba(0,224,255,.08)';
+      }
+    }
+
+    async function submitPalindrome() {
+      const input = document.getElementById('inputText').value.trim();
+      if (!input) return;
+      try {
+        setStatus('Checking…');
+        const res = await fetch(API.POST, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ input })
+        });
+        const text = await res.text();
+        const normalized = text.toLowerCase();
+        const isPal = normalized.includes('true') || normalized.includes('palindrome');
+        setStatus(`Result: ${text}`, isPal);
+        toast('Saved! Fetching records…', 'success');
+        await refreshRecords();
+        document.getElementById('create-form').reset();
+      } catch (e) {
+        console.error(e);
+        toast('Failed to check/save. See console.', 'error');
+      }
+    }
+
+    async function refreshRecords() {
+      try {
+        const res = await fetch(API.GET);
+        const data = await res.json();
+        renderTable(data);
+      } catch (e) {
+        console.error(e);
+        toast('Failed to load records.', 'error');
+      }
+    }
+
+    function renderTable(rows) {
+      tbody.innerHTML = '';
+      const q = document.getElementById('search').value.trim().toLowerCase();
+      const filtered = rows.filter(r => !q || String(r.id).includes(q) || (r.input||'').toLowerCase().includes(q) || (r.output||'').toLowerCase().includes(q));
+      for (const r of filtered) {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>#${r.id}</td>
+          <td style="word-break: break-word;">${escapeHtml(r.input ?? '')}</td>
+          <td>
+            <span class="badge" style="border-color:${(r.output||'').toLowerCase().includes('true')|| (r.output||'').toLowerCase().includes('palindrome') ? 'rgba(37,211,102,.5)':'rgba(255,77,79,.5)'}">${escapeHtml(r.output ?? '')}</span>
+          </td>
+          <td>
+            <div style="display:flex; gap:8px;">
+              <button class="btn" onclick="openEdit(${r.id}, \`${escapeBackticks(r.input ?? '')}\`)">✏ Edit</button>
+              <button class="btn danger" onclick="deleteRecord(${r.id})">🗑 Delete</button>
+            </div>
+          </td>`;
+        tbody.appendChild(tr);
+      }
+      countBadge.textContent = `${filtered.length} record${filtered.length===1?'':'s'}`;
+      // persist last data for export
+      window.__lastRows = rows;
+    }
+
+    function filterTable() { refreshRecords(); }
+
+    function openEdit(id, input) {
+      document.getElementById('edit-id').value = id;
+      document.getElementById('edit-input').value = input;
+      document.getElementById('editModal').showModal();
+    }
+
+    function closeModal() { document.getElementById('editModal').close(); }
+
+    async function saveEdit() {
+      const id = Number(document.getElementById('edit-id').value);
+      const input = document.getElementById('edit-input').value.trim();
+      if (!input) return toast('Input is required', 'warn');
+      try {
+        const res = await fetch(API.PUT, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id, input })
+        });
+        if (!res.ok) throw new Error('Update failed');
+        toast('Updated successfully', 'success');
+        closeModal();
+        await refreshRecords();
+      } catch (e) {
+        console.error(e);
+        toast('Failed to update.', 'error');
+      }
+    }
+
+    async function deleteRecord(id) {
+      if (!confirm(`Delete record #${id}?`)) return;
+      try {
+        const res = await fetch(API.DELETE, {
+          method: 'DELETE',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id })
+        });
+        if (!res.ok) throw new Error('Delete failed');
+        toast('Deleted', 'success');
+        await refreshRecords();
+      } catch (e) {
+        console.error(e);
+        toast('Failed to delete.', 'error');
+      }
+    }
+
+    function exportCSV() {
+      const rows = window.__lastRows || [];
+      if (!rows.length) return toast('No data to export', 'warn');
+      const headers = ['id','input','output'];
+      const csv = [headers.join(',')].concat(
+        rows.map(r => [r.id, csvEscape(r.input||''), csvEscape(r.output||'')].join(','))
+      ).join('\n');
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = 'palindromes.csv'; a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    // Helpers
+    function csvEscape(s){
+      const needs = /[",\n]/.test(s);
+      return needs ? '"' + s.replace(/"/g,'""') + '"' : s;
+    }
+    function escapeHtml(str){
+      return String(str).replace(/[&<>\"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;','\'':'&#39;'}[m]));
+    }
+    function escapeBackticks(str){
+      return String(str).replace(/`/g, '\\`').replace(/\\/g, '\\\\');
+    }
+
+    // Initial load
+    refreshRecords();
+  </script>
+</body>
+</html>
