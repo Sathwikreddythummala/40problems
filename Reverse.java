@@ -23,7 +23,13 @@ public class Reverse {
         return id;
     }
     
-    public void setInput(String input)
+    public void setId(Long id)
+    {
+    	this.id = id;
+    }
+    
+
+	public void setInput(String input)
     {
     	this.input = input;
     }
